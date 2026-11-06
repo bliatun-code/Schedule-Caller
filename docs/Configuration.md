@@ -2,6 +2,8 @@
 
 The three editions use the same configuration menus. Screenshots show Schedule Caller 1.0.0 in the X20RS simulator with ETHOS 26.1.2.
 
+[Norsk konfigurasjonsguide](Konfigurasjon-norsk.md)
+
 ## Install and open the widget
 
 1. Download the ZIP for **IMAC**, **F3A** or **Sportflyer** from [Releases](https://github.com/bliatun-code/Schedule-Caller/releases).
@@ -11,11 +13,19 @@ The three editions use the same configuration menus. Screenshots show Schedule C
 
 ![ETHOS widget configuration page showing the version and the three collapsed sections](images/configure-widget.png)
 
+**English voice sample · Name only** — IMAC 2027 Basic, figure 5, Half Cuban. Use the speaker icon if the player starts muted.
+
+https://github.com/user-attachments/assets/fd097fcc-fd3b-4749-9524-0d2d6ee18c49
+
 ## Appearance
 
 Choose **Layout = Diagram** for a drawing of the current manoeuvre, or a text layout to read the description on the screen.
 
 ![Appearance settings with Diagram selected, both names off and Light selected](images/appearance-menu.png)
+
+**English voice sample · Name + description** — the same manoeuvre with the full call.
+
+https://github.com/user-attachments/assets/7330addf-a096-4bd7-91c9-8c414fb1203b
 
 | Field | What it changes |
 | --- | --- |

@@ -8,7 +8,7 @@ Full-screen aerobatic practice widgets for FrSky ETHOS. Call the next manoeuvre 
 | **F3A** | A-27, P-27 and F-27, including their figure 10 alternatives |
 | **Sportflyer** | F3A-Sport 2011 and Vingtreff |
 
-[Installation packages](https://github.com/bliatun-code/Schedule-Caller/releases) · [Illustrated setup guide](docs/Configuration.md) · [Lua source](src/) · [Credits and rights](RIGHTS.md)
+[Installation packages](https://github.com/bliatun-code/Schedule-Caller/releases) · [Illustrated setup guide](docs/Configuration.md) · [Norsk konfigurasjonsguide](docs/Konfigurasjon-norsk.md) · [Lua source](src/) · [Credits and rights](RIGHTS.md)
 
 ![Diagram view advancing through two manoeuvres in each of the IMAC, F3A and Sportflyer widgets](docs/images/diagram-preview.gif)
 
