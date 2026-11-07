@@ -7,15 +7,15 @@ De tre utgavene har de samme menyene. Skjermbildene viser Schedule Caller 1.0.0 
 ## Installer og åpne widgeten
 
 1. Last ned ZIP-filen for **IMAC**, **F3A** eller **Sportflyer** fra [Releases](https://github.com/bliatun-code/Schedule-Caller/releases).
-2. Koble radioen til FrSky Suite. Åpne **Lua library → Install Lua scripts** og installer ZIP-filen.
+2. Koble radioen til FrSky Suite. Åpne **Lua library → Install Lua scripts** og installer ZIP-filen. Beregn noen minutter for de større utgavene, og la radioen være tilkoblet til Suite er ferdig.
 3. Start radioen på nytt og legg den valgte utgaven i et widgetfelt som dekker **hele skjermen**.
 4. Trykk på widgeten eller på midtknappen på høyre side av X20RS. Velg **Configure widget** i ETHOS-menyen.
 
 ![ETHOS-oppsettet med versjonsnummer og de tre lukkede menyseksjonene](images/configure-widget.png)
 
-**Norsk lydprøve · Bare navn** — IMAC 2027 Basic, figur 5, Halv kubansk åtter. Bruk høyttalerikonet hvis avspilleren starter uten lyd.
+**Norsk lydprøve · Bare navn**. Iselin leser Halv kubansk åtter, figur 5 i IMAC 2027 Basic. Bruk høyttalerikonet hvis avspilleren starter uten lyd.
 
-https://github.com/user-attachments/assets/bda6bb9d-af0c-40c8-b544-ce47acaba0b3
+https://github.com/user-attachments/assets/39738de0-9b92-47c8-bacc-31b842c9f2af
 
 ## Utseende
 
@@ -23,9 +23,9 @@ Velg **Layout = Diagram** for å se illustrasjonen av manøveren. Velg et teksto
 
 ![Appearance med Diagram, begge navneradene av og lyst tema](images/appearance-menu.png)
 
-**Norsk lydprøve · Navn og beskrivelse** — samme manøver med full opplesning.
+**Norsk lydprøve · Navn og beskrivelse**. Hør samme manøver med full opplesning.
 
-https://github.com/user-attachments/assets/4bdb4494-5034-48d4-b1a9-278780487f9b
+https://github.com/user-attachments/assets/0b3e6a4d-4465-4946-b2cd-7762e19b70ec
 
 | Felt | Hva det styrer |
 | --- | --- |
@@ -48,9 +48,13 @@ Illustrasjoner fra IMAC (International Miniature Aerobatic Club).
 
 ### Velg vindretning
 
-Velg pilen som samsvarer med vinden på feltet. Vindvelgeren på startskjermen og pilen i tittellinjen viser samme valg.
+Trykk på vindvelgeren for å veksle mellom B og C. Velg pilen som viser hvilken vei vinden blåser. Pilen i tittellinjen viser samme valg.
 
-![IMAC-startskjerm med vind B valgt](images/diagram-start.png)
+| IMAC · Lyst tema | F3A · Mørkt tema |
+| --- | --- |
+| ![Startskjermen i IMAC Basic med vind B valgt i lyst tema](images/diagram-start.png) | ![Startskjermen i F3A A-27 med vind B valgt i mørkt tema](images/f3a-wind-selector-dark.png) |
+
+Bildene nedenfor viser samme P-27-figur med hver sin vindretning.
 
 | Vind B ← | Vind C → |
 | --- | --- |

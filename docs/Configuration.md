@@ -7,15 +7,15 @@ The three editions use the same configuration menus. Screenshots show Schedule C
 ## Install and open the widget
 
 1. Download the ZIP for **IMAC**, **F3A** or **Sportflyer** from [Releases](https://github.com/bliatun-code/Schedule-Caller/releases).
-2. Connect your radio to FrSky Suite. Open **Lua library → Install Lua scripts** and install the selected ZIP.
+2. Connect your radio to FrSky Suite. Open **Lua library → Install Lua scripts** and install the selected ZIP. Allow several minutes for the larger editions and keep the radio connected until Suite finishes.
 3. Restart the radio and add that edition to a **full-screen** widget area on your model.
 4. Tap the widget or press the right-side centre button on the X20RS. Choose **Configure widget** from the ETHOS menu.
 
 ![ETHOS widget configuration page showing the version and the three collapsed sections](images/configure-widget.png)
 
-**English voice sample · Name only** — IMAC 2027 Basic, figure 5, Half Cuban. Use the speaker icon if the player starts muted.
+**English voice sample · Name only**. Jenny reads Half Cuban, IMAC 2027 Basic figure 5. Use the speaker icon if the player starts muted.
 
-https://github.com/user-attachments/assets/fd097fcc-fd3b-4749-9524-0d2d6ee18c49
+https://github.com/user-attachments/assets/687e81ab-eb04-4f62-b4a8-67f878b24dfe
 
 ## Appearance
 
@@ -23,9 +23,9 @@ Choose **Layout = Diagram** for a drawing of the current manoeuvre, or a text la
 
 ![Appearance settings with Diagram selected, both names off and Light selected](images/appearance-menu.png)
 
-**English voice sample · Name + description** — the same manoeuvre with the full call.
+**English voice sample · Name + description**. Hear the same manoeuvre with the full call.
 
-https://github.com/user-attachments/assets/7330addf-a096-4bd7-91c9-8c414fb1203b
+https://github.com/user-attachments/assets/a3b1f007-2cb7-44ef-9c10-72e0efa31b37
 
 | Field | What it changes |
 | --- | --- |
@@ -48,9 +48,13 @@ Illustrations from IMAC (International Miniature Aerobatic Club).
 
 ### Select the wind
 
-Choose the arrow that matches the wind at the field. The start selector and the arrow in the header show the same setting.
+Tap the wind card to switch between B and C. Match the arrow to the direction the wind is blowing. The arrow in the header shows the same choice.
 
-![IMAC start screen showing the wind selector set to B](images/diagram-start.png)
+| IMAC · Light | F3A · Dark |
+| --- | --- |
+| ![IMAC Basic start screen with the Wind B selector in Light](images/diagram-start.png) | ![F3A A-27 start screen with the Wind B selector in Dark](images/f3a-wind-selector-dark.png) |
+
+The two diagrams below show how the same P-27 figure changes with the wind setting.
 
 | Wind B ← | Wind C → |
 | --- | --- |

@@ -50,7 +50,10 @@ local function optionalLoad(path)
   if not file then return nil,"Missing "..path end
   file:close()
   local ok,result=pcall(dofile,path)
-  if not ok then return nil,"Cannot load "..path end
+  if not ok then
+    print("Schedule Caller IMAC: cannot load "..path..": "..tostring(result))
+    return nil,"Cannot load "..path
+  end
   return result
 end
 local function record(event)
@@ -106,6 +109,41 @@ local function readProfile(program)
   end
   return result
 end
+local function loadAudio(programId)
+  local Audio=shared.audioModule
+  local filename=type(shared.audioCatalogs)=="table" and shared.audioCatalogs[programId]
+  local engine=shared.audio
+  if engine then engine.catalog=nil end
+  local catalog,catalogProblem
+  if filename then catalog,catalogProblem=optionalLoad(BASE.."audio/"..filename) end
+  local validCatalog,validationProblem
+  if type(Audio)=="table" and type(Audio.new)=="function" and type(Audio.validateCatalog)=="function" then
+    local ok,value,problem=pcall(Audio.validateCatalog,catalog)
+    validCatalog=ok and value==true
+    validationProblem=ok and problem or "Invalid audio catalog validator"
+  end
+  shared.audioReady=false
+  if validCatalog then
+    if engine then
+      engine.catalog=catalog
+    else
+      engine=Audio.new(BASE,catalog,function(kind,message)
+        if kind=="error" then shared.audioError=tostring(message)
+        elseif kind=="clear" then shared.audioError=nil end
+        dirty()
+      end)
+      shared.audio=engine
+    end
+    shared.audioReady=type(engine.inspect)=="function"
+    shared.audioError=not shared.audioReady and "Audio validator unavailable" or nil
+  else
+    shared.audioError=shared.audioModuleError or shared.audioCatalogIndexError or catalogProblem
+      or (not filename and "Missing audio catalog for "..programId)
+      or validationProblem or "Invalid audio installation"
+  end
+  if _G.SC_TEST then SC_TEST.audioReady=shared.audioReady end
+end
+
 local function ensureShared()
   if shared.store then return end
   shared.store=Store.new(BASE.."user-settings")
@@ -133,26 +171,9 @@ local function ensureShared()
     else shared.imageError="Diagram library could not be loaded" end
   else shared.imageError=imageProblem or "Diagram library is not installed" end
   if type(Render.setImageLibrary)=="function" then Render.setImageLibrary(shared.images) end
-  local Audio,moduleProblem=optionalLoad(BASE.."lib/audio.lua")
-  local catalog,catalogProblem=optionalLoad(BASE.."audio/catalog.lua")
-  local validCatalog,validationProblem
-  if type(Audio)=="table" and type(Audio.new)=="function" and type(Audio.validateCatalog)=="function" then
-    local ok,value,problem=pcall(Audio.validateCatalog,catalog)
-    validCatalog=ok and value==true
-    validationProblem=ok and problem or "Invalid audio catalog validator"
-  end
-  if validCatalog then
-    shared.audio=Audio.new(BASE,catalog,function(kind,message)
-      if kind=="error" then shared.audioError=tostring(message)
-      elseif kind=="clear" then shared.audioError=nil end
-      dirty()
-    end)
-    shared.audioReady=type(shared.audio)=="table" and type(shared.audio.inspect)=="function"
-    if not shared.audioReady then shared.audioError="Audio catalog or validator unavailable" end
-  else
-    shared.audioError=moduleProblem or catalogProblem or validationProblem or "Invalid audio installation"
-  end
-  if _G.SC_TEST then SC_TEST.audioReady=shared.audioReady end
+  shared.audioModule,shared.audioModuleError=optionalLoad(BASE.."lib/audio.lua")
+  shared.audioCatalogs,shared.audioCatalogIndexError=optionalLoad(BASE.."audio/catalog.lua")
+  loadAudio(program.id)
 end
 local function saveSoon()
   shared.saveAt=now()+.2
@@ -199,6 +220,7 @@ local function setProgram(id)
   if shared.core.program.id==id then return true end
   shared.profile=readProfile(program)
   shared.core:setProgram(program,shared.profile.variants)
+  loadAudio(id)
   shared.store:set("program",id);saveSoon()
   if shared.buttons then shared.buttons:clear() end
   for _,w in ipairs(shared.instances) do w.scroll=0 end

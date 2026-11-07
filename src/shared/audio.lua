@@ -39,7 +39,7 @@ function Audio.validateCatalog(catalog,deep)
     local numbers,common=catalog.numbers[language],catalog.common[language]
     if type(numbers)~="table" or next(numbers)==nil then return nil,"Invalid figure-number audio: "..language end
     if type(common)~="table" then return nil,"Invalid common audio: "..language end
-    if not reference(common.ready) or not reference(common.audioError) then return nil,"Missing common audio: "..language end
+    if not reference(common.ready) then return nil,"Missing common audio: "..language end
   end
   if deep~=true then return true end
   for hash in pairs(catalog.clips) do
@@ -56,6 +56,8 @@ function Audio.validateCatalog(catalog,deep)
     return type(value)=="table" and sequence(value.nbLearning) and sequence(value.enLearning)
       and (value.title==nil or reference(value.title))
       and (value.title_nb==nil or reference(value.title_nb))
+      and (value.number_nb==nil or reference(value.number_nb))
+      and (value.number_en==nil or reference(value.number_en))
   end
   for programId,program in pairs(catalog.programs) do
     if type(programId)~="string" or programId=="" or type(program)~="table" or next(program)==nil then return nil,"Invalid audio program" end
@@ -183,18 +185,19 @@ function Audio:_sequence(programId,step,profile)
     return true
   end
   local ok,error
+  local recordedNumber=entry["number_"..language]
   if step.kind~="figure" then
     ok,error=add(entry[language.."Learning"],language,0)
   else
     if profile.number~=false then
-      ok,error=add(field(field(self.catalog.numbers,language),step.number),language,0)
+      ok,error=add(recordedNumber or field(field(self.catalog.numbers,language),step.number),language,0)
       if not ok then return nil,"Missing figure-number audio: "..tostring(step.number) end
     end
     local titleLanguage=language=="nb" and profile.titleLanguage=="nb" and "nb" or "en"
     local titleKey=titleLanguage=="nb" and "title_nb" or "title"
     local titleGap=profile.number~=false and language~=titleLanguage and VOICE_GAP or 0
     ok,error=add(entry[titleKey],titleLanguage,titleGap)
-    if ok and mode~="expert" then ok,error=add(entry[language.."Learning"],language,VOICE_GAP) end
+    if ok and mode~="expert" then ok,error=add(entry[language.."Learning"],language,recordedNumber and language==titleLanguage and 0 or VOICE_GAP) end
   end
   if not ok then return nil,error end
   return sequence

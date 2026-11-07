@@ -455,7 +455,12 @@ local function diagramPlan(plan,view,width,height,scale,headerHeight,errorHeight
     local cardHeight=min(floor(body.h*.57),max(66,floor(96*scale)))
     local card=rect(body.x+floor((body.w-cardWidth)/2),body.y+max(0,floor(12*scale)),cardWidth,cardHeight)
     plan.windRect=card;plan.hitRects.wind=card
-    addFill(plan,card,p.panel);border(plan,card,p.border)
+    local windPanel=p.panel
+    if view.theme=="light" then windPanel=rgb(218,226,236)
+    elseif view.theme=="dark" then windPanel=rgb(49,60,72) end
+    addFill(plan,card,windPanel)
+    border(plan,card,p.fg)
+    border(plan,rect(card.x+1,card.y+1,card.w-2,card.h-2),p.fg)
     label(plan,"SELECT WIND",17*scale,rect(card.x+12,card.y+4,card.w-24,max(20,floor(25*scale))),p.muted,"wind-label","center")
     local arrow=rect(card.x+floor(card.w*.08),card.y+floor(card.h*.40),floor(card.w*.28),max(14,floor(card.h*.27)))
     windArrow(plan,arrow,wind,p.fg)

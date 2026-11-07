@@ -10,4 +10,4 @@ The Schedule Caller Lua source in [src](src/) is provided with rights reserved. 
 - **F3A** · CIAM F3 Aerobatic drawings by Peter Uhlig.
 - **Sportflyer** · F3A-Sport 2011 drawings are based on the schedule diagrams. Vingtreff drawings are based on the Vingtreff material from Asker Modellklubb.
 
-The illustrations and audio in the installation packages retain their respective rights. The documentation shows selected diagrams in context as part of the widget screenshots.
+The installation packages include illustrations from the sources above and speech generated with Microsoft Azure AI Speech. These assets retain their respective rights. The documentation shows selected diagrams in context as part of the widget screenshots.

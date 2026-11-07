@@ -1,10 +1,10 @@
 # Schedule Caller
 
-Full-screen aerobatic practice widgets for FrSky ETHOS. Use your radio switches to advance through the schedule at your own pace or repeat a call. Practise with full descriptions, switch to short name-only calls as you learn the sequence, or turn speech off. Choose English, Norwegian, or English names with Norwegian descriptions.
+Full-screen aerobatic practice widgets for FrSky ETHOS. Advance, repeat or restart the schedule with your assigned radio switches. Practise with full descriptions, switch to short name-only calls as you learn the sequence, or turn speech off. Choose English, Norwegian, or English names with Norwegian descriptions.
 
 | Edition | Schedules |
 | --- | --- |
-| **IMAC** | IMAC 2027 Basic, Sportsman, Intermediate, Advanced and Unlimited, including the three ALT schedules |
+| **IMAC** | IMAC 2027 Basic, Sportsman, Intermediate, Advanced and Unlimited, with Intermediate ALT, Advanced ALT and Unlimited ALT |
 | **F3A** | A-27, P-27 and F-27, including their figure 10 alternatives |
 | **Sportflyer** | F3A-Sport 2011 and Vingtreff |
 
@@ -12,7 +12,7 @@ Full-screen aerobatic practice widgets for FrSky ETHOS. Use your radio switches 
 
 ![Diagram view advancing through two manoeuvres in each of the IMAC, F3A and Sportflyer widgets](docs/images/diagram-preview.gif)
 
-Diagram view follows the selected wind direction. Show the current and next manoeuvre names for a quick prompt, or hide both to give the drawing more room. The GIF shows the default view on the X20RS simulator.
+Tap the wind selector on the start screen to choose which diagrams the widget displays. Show the current and next manoeuvre names for a quick prompt, or hide both to give the drawing more room. The GIF shows the default view on the X20RS simulator.
 
 <table>
 <tr>
