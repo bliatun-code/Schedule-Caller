@@ -14,25 +14,27 @@ end
 function Buttons:poll(now, nextPressed, repeatPressed, resetPressed)
   if self.lastTime and now < self.lastTime then self:clear() end
   self.lastTime = now
+  -- poll runs in every wakeup, also behind other widgets. Update the one state
+  -- table in place so polling allocates nothing in the shared Lua heap.
+  local last=self.last
+  local previousNext,previousRepeat,previousReset=last.next,last.repeatButton,last.reset
+  last.next,last.repeatButton,last.reset=nextPressed,repeatPressed,resetPressed
   -- Re-arm only after all controls are released, including after model change.
   if not self.armed then
     if not nextPressed and not repeatPressed and not resetPressed then self.armed=true end
-    self.last={next=nextPressed,repeatButton=repeatPressed,reset=resetPressed}
     return
   end
-  local previous=self.last
-  self.last={next=nextPressed,repeatButton=repeatPressed,reset=resetPressed}
-  if self.dedicatedReset and resetPressed and not previous.reset then
+  if self.dedicatedReset and resetPressed and not previousReset then
     self.due,self.downAt,self.second,self.held=nil,nil,false,false
     self.emit("reset")
     return
   end
-  if nextPressed and not previous.next then
+  if nextPressed and not previousNext then
     self.due,self.downAt,self.second,self.held=nil,nil,false,false
     self.emit("next")
     return
   end
-  if repeatPressed and not previous.repeatButton then
+  if repeatPressed and not previousRepeat then
     -- If wakeup first sees another tap after the deadline, the earlier tap is
     -- already a single. Deliver it before arming the new gesture.
     if self.due and now>self.due then
@@ -47,7 +49,7 @@ function Buttons:poll(now, nextPressed, repeatPressed, resetPressed)
     self.held,self.due,self.second=true,nil,false
     self.emit("reset")
   end
-  if not repeatPressed and previous.repeatButton then
+  if not repeatPressed and previousRepeat then
     if not self.held and self.downAt then
       if not self.dedicatedReset and now-self.downAt>=self.holdTime then
         self.emit("reset");self.due=nil

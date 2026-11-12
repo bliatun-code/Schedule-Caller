@@ -22,20 +22,25 @@ local function dirty()
   for _,w in ipairs(shared.instances) do w.refresh=true end
 end
 local function valid(w) return type(w)=="table" and not w.destroyed end
+-- Module-level readers: pressed() runs for three sources in every wakeup,
+-- also behind VoltDeck/GasDeck, so it must not create closures.
+local function sourceCategory(value) return value:category() end
+local function sourceValue(value) return value:value() end
+local function sourceState(value) return value:state() end
 local function source(value)
   if type(value)=="string" then value=call(system.getSource,value) end
   if type(value)~="userdata" and type(value)~="table" then return nil end
-  local category=call(function() return value:category() end)
+  local category=call(sourceCategory,value)
   if category==CATEGORY_NONE then return nil end
   return value
 end
 local function pressed(value)
   if not value then return false end
   -- Whole momentary sources have a useful value, but state() can remain false.
-  local number=call(function() return value:value() end)
+  local number=call(sourceValue,value)
   if finite(number) then return number>0 end
   if type(number)=="boolean" then return number end
-  return call(function() return value:state() end)==true
+  return call(sourceState,value)==true
 end
 local function modelKey() return tostring(call(model.path) or call(model.id) or call(model.name) or "unknown") end
 local function member(list,value,fallback)
@@ -73,8 +78,10 @@ local function record(event)
     else entry.audioAccepted=false;entry.audioError=shared.audioError or "Audio installation incomplete" end
     shared.lastAudioRequest=entry
   end
-  shared.events[#shared.events+1]=entry
-  if #shared.events>80 then table.remove(shared.events,1) end
+  if shared.simulation then
+    shared.events[#shared.events+1]=entry
+    if #shared.events>80 then table.remove(shared.events,1) end
+  end
 end
 local function loadProgram(id)
   for _,item in ipairs(Index) do
@@ -106,53 +113,78 @@ local function readProfile(program)
   end
   return result
 end
+-- Ethos stops create() after about 20 000 Lua instructions. Reading settings
+-- costs about 7 instructions per byte per slot, so settings saved for many
+-- programs plus the selected program and catalog went over the limit on the
+-- radio. Loading therefore runs from wakeup, one small step per call.
+local loadSteps={
+  function()
+    shared.store=Store.new(BASE.."user-settings")
+    shared.settings={layout=member({"focus","deck","daylight","briefing","diagram"},shared.store:get("layout"),"diagram"),
+      theme=member({"radio","dark","light","custom"},shared.store:get("theme"),"light"),
+      preview=shared.store:get("preview","current")=="next" and "next" or "current",
+      diagramTitle=shared.store:get("diagramTitle","false")=="true",
+      diagramPreview=shared.store:get("diagramPreview","current")=="next" and "next" or "current",
+      playbackMode="segments",
+      wind=member({"B","C"},shared.store:get("wind"),"B"),
+      foreground=number(shared.store:get("foreground"),lcd.RGB(255,255,255)),
+      background=number(shared.store:get("background"),lcd.RGB(0,0,0))}
+    if shared.store:get("playbackMode")~="segments" then shared.store:set("playbackMode","segments");shared.saveAt=now()+.2 end
+  end,
+  function()
+    local selected=shared.store:get("program",Index[1].id)
+    local program=loadProgram(selected) or loadProgram(Index[1].id)
+    if program.id~=selected then shared.store:set("program",program.id);shared.saveAt=now()+.2 end
+    shared.profile=readProfile(program)
+    shared.core=Core.new(program,record)
+    shared.core.variants=shared.profile.variants
+    shared.modelKey=modelKey()
+  end,
+  function()
+    local Images,imageProblem=optionalLoad(BASE.."lib/images.lua")
+    if type(Images)=="table" and type(Images.new)=="function" then
+      local ok,library=pcall(Images.new,BASE)
+      if ok and type(library)=="table" then shared.images=library
+      else shared.imageError="Diagram library could not be loaded" end
+    else shared.imageError=imageProblem or "Diagram library is not installed" end
+    if type(Render.setImageLibrary)=="function" then Render.setImageLibrary(shared.images) end
+  end,
+  function()
+    shared.audioModule,shared.audioModuleError=optionalLoad(BASE.."lib/audio.lua")
+    shared.audioCatalog,shared.audioCatalogError=optionalLoad(BASE.."audio/catalog.lua")
+  end,
+  function()
+    local Audio,catalog=shared.audioModule,shared.audioCatalog
+    local validCatalog,validationProblem
+    if type(Audio)=="table" and type(Audio.new)=="function" and type(Audio.validateCatalog)=="function" then
+      local ok,value,problem=pcall(Audio.validateCatalog,catalog)
+      validCatalog=ok and value==true
+      validationProblem=ok and problem or "Invalid audio catalog validator"
+    end
+    if validCatalog then
+      shared.audio=Audio.new(BASE,catalog,function(kind,message)
+        if kind=="error" then shared.audioError=tostring(message)
+        elseif kind=="clear" then shared.audioError=nil end
+        dirty()
+      end)
+      shared.audioReady=type(shared.audio)=="table" and type(shared.audio.inspect)=="function"
+      if not shared.audioReady then shared.audioError="Audio catalog or validator unavailable" end
+    else
+      shared.audioError=shared.audioModuleError or shared.audioCatalogError or validationProblem or "Invalid audio installation"
+    end
+    if _G.SC_TEST then SC_TEST.audioReady=shared.audioReady end
+  end,
+}
+local function loadStep()
+  if shared.ready then return true end
+  local index=(shared.loaded or 0)+1
+  loadSteps[index]()
+  shared.loaded=index
+  if index==#loadSteps then shared.ready=true;dirty() end
+  return shared.ready
+end
 local function ensureShared()
-  if shared.store then return end
-  shared.store=Store.new(BASE.."user-settings")
-  shared.settings={layout=member({"focus","deck","daylight","briefing","diagram"},shared.store:get("layout"),"diagram"),
-    theme=member({"radio","dark","light","custom"},shared.store:get("theme"),"light"),
-    preview=shared.store:get("preview","current")=="next" and "next" or "current",
-    diagramTitle=shared.store:get("diagramTitle","false")=="true",
-    diagramPreview=shared.store:get("diagramPreview","current")=="next" and "next" or "current",
-    playbackMode="segments",
-    wind=member({"B","C"},shared.store:get("wind"),"B"),
-    foreground=number(shared.store:get("foreground"),lcd.RGB(255,255,255)),
-    background=number(shared.store:get("background"),lcd.RGB(0,0,0))}
-  if shared.store:get("playbackMode")~="segments" then shared.store:set("playbackMode","segments");shared.saveAt=now()+.2 end
-  local selected=shared.store:get("program",Index[1].id)
-  local program=loadProgram(selected) or loadProgram(Index[1].id)
-  if program.id~=selected then shared.store:set("program",program.id);shared.saveAt=now()+.2 end
-  shared.profile=readProfile(program)
-  shared.core=Core.new(program,record)
-  shared.core.variants=shared.profile.variants
-  shared.modelKey=modelKey()
-  local Images,imageProblem=optionalLoad(BASE.."lib/images.lua")
-  if type(Images)=="table" and type(Images.new)=="function" then
-    local ok,library=pcall(Images.new,BASE)
-    if ok and type(library)=="table" then shared.images=library
-    else shared.imageError="Diagram library could not be loaded" end
-  else shared.imageError=imageProblem or "Diagram library is not installed" end
-  if type(Render.setImageLibrary)=="function" then Render.setImageLibrary(shared.images) end
-  local Audio,moduleProblem=optionalLoad(BASE.."lib/audio.lua")
-  local catalog,catalogProblem=optionalLoad(BASE.."audio/catalog.lua")
-  local validCatalog,validationProblem
-  if type(Audio)=="table" and type(Audio.new)=="function" and type(Audio.validateCatalog)=="function" then
-    local ok,value,problem=pcall(Audio.validateCatalog,catalog)
-    validCatalog=ok and value==true
-    validationProblem=ok and problem or "Invalid audio catalog validator"
-  end
-  if validCatalog then
-    shared.audio=Audio.new(BASE,catalog,function(kind,message)
-      if kind=="error" then shared.audioError=tostring(message)
-      elseif kind=="clear" then shared.audioError=nil end
-      dirty()
-    end)
-    shared.audioReady=type(shared.audio)=="table" and type(shared.audio.inspect)=="function"
-    if not shared.audioReady then shared.audioError="Audio catalog or validator unavailable" end
-  else
-    shared.audioError=moduleProblem or catalogProblem or validationProblem or "Invalid audio installation"
-  end
-  if _G.SC_TEST then SC_TEST.audioReady=shared.audioReady end
+  while not loadStep() do end
 end
 local function saveSoon()
   shared.saveAt=now()+.2
@@ -171,6 +203,7 @@ local function setGlobal(key,value)
   shared.settings[key]=validValue;shared.store:set(key,validValue);saveSoon();dirty();return true
 end
 local function setProfile(key,value)
+  ensureShared()
   if key=="speech" then
     if not member({"en","nb","nb-native","off"},value,nil) then return false end
     local enabled=value~="off"
@@ -194,6 +227,7 @@ local function setProfile(key,value)
   shared.store:set("p."..shared.core.program.id.."."..key,accepted);saveSoon();dirty();return true
 end
 local function setProgram(id)
+  ensureShared()
   local program=loadProgram(id)
   if not program then return false end
   if shared.core.program.id==id then return true end
@@ -205,6 +239,7 @@ local function setProgram(id)
   dirty();return true
 end
 local function setVariant(stepId,variantId)
+  ensureShared()
   if not shared.core:setVariant(stepId,variantId) then return false end
   shared.profile.variants[stepId]=variantId
   shared.store:set("p."..shared.core.program.id..".variant."..stepId,variantId);saveSoon()
@@ -213,6 +248,7 @@ local function setVariant(stepId,variantId)
   dirty();return true
 end
 local function action(kind)
+  ensureShared()
   local core=shared.core
   if kind=="next" then core:next()
   elseif kind=="repeat" then core:repeatCurrent()
@@ -242,6 +278,7 @@ local function configChanged(w)
   dirty()
 end
 local function selectFigure(value)
+  ensureShared()
   local ok=shared.core:selectFigure(value)
   if ok then
     if shared.buttons then shared.buttons:clear() end
@@ -334,7 +371,6 @@ local function scroll(w,delta)
 end
 local function hit(rect,x,y) return rect and x>=rect.x and x<rect.x+rect.w and y>=rect.y and y<rect.y+rect.h end
 local function create()
-  ensureShared()
   local identity=modelKey()
   if shared.bindingKey~=identity then
     shared.bindingKey=identity;shared.bindingConfigured=false;shared.bindingResetMode="separate"
@@ -365,6 +401,7 @@ local function write(w)
 end
 local function wakeup(w)
   if not valid(w) then return end
+  if not shared.ready then loadStep();return end
   local time=now()
   w.visible=call(lcd.isVisible)==true
   if not valid(shared.owner) or (w.visible and not shared.owner.visible) then claimOwner(w) end
@@ -378,10 +415,8 @@ local function wakeup(w)
     if not w.storageError then shared.buttons:poll(time,pressed(w.sources.nextSource),pressed(w.sources.repeatSource),w.resetMode=="separate" and pressed(w.sources.resetSource) or false) end
     if shared.audio then
       shared.audio:update(now())
-      local flight=shared.audio.inFlight
-      local playing=flight and finite(flight.expectedEnd) and flight.expectedEnd>now()
-      local signature=tostring(shared.audio.waitingForPrevious==true)..":"..tostring(shared.audio.awaitingManual==true)..":"..tostring(playing==true)
-      if signature~=shared.audioUiSignature then shared.audioUiSignature=signature;dirty() end
+      local queued=shared.audio.waitingForPrevious==true
+      if queued~=shared.audioQueued then shared.audioQueued=queued;dirty() end
     end
     if shared.saveAt and time>=shared.saveAt then
       shared.saveAt=nil
@@ -391,7 +426,7 @@ local function wakeup(w)
     end
   end
   updateLcd(w,time)
-  if shared.settings.theme=="radio" and (not w.nextThemeAt or time>=w.nextThemeAt) then
+  if shared.settings.theme=="radio" and w.visible and (not w.nextThemeAt or time>=w.nextThemeAt) then
     w.nextThemeAt=time+1
     local colors={}
     for _,name in ipairs({"THEME_DEFAULT_COLOR","THEME_DEFAULT_BGCOLOR","THEME_SECONDARY_COLOR","THEME_SECONDARY_BGCOLOR","THEME_WARNING_COLOR"}) do
@@ -407,7 +442,12 @@ local function wakeup(w)
     local changed=shared.images:select(path,time)
     if shared.images:update(now()) or changed then dirty() end
   end
-  if w.refresh or w.seenRevision~=shared.revision or w.seenCoreRevision~=shared.core.revision then buildPlan(w);if call(lcd.isVisible) then lcd.invalidate() end end
+  if w.refresh or w.seenRevision~=shared.revision or w.seenCoreRevision~=shared.core.revision then
+    -- Behind VoltDeck/GasDeck the plan is not drawn. Rebuild it when this
+    -- instance becomes visible; keep the first plan so paint always has one.
+    if w.visible or not w.plan then buildPlan(w) end
+    if w.visible then lcd.invalidate() end
+  end
   if shared.simulation and _G.SC_TEST and type(SC_TEST.onWakeup)=="function" and shared.owner==w then SC_TEST.onWakeup(w,time) end
 
 end
@@ -598,10 +638,11 @@ local function init()
       menu=function() return menu(shared.owner) end,
       scroll=function(delta) return scroll(shared.owner,delta) end,
       create=create,destroy=destroy,
-      save=function() return shared.store:save() end,
+      save=function() ensureShared();return shared.store:save() end,
       setResetMode=function(value) assert(value=="hold" or value=="separate");shared.owner.resetMode=value;configChanged(shared.owner) end,
       setSource=function(key,value) local w=shared.owner;assert(key=="nextSource" or key=="repeatSource" or key=="resetSource");w.sources[key]=source(value);configChanged(w) end,
       inspect=function()
+        ensureShared()
         local step,index,ready=shared.core:current()
         return {program=shared.core.program.id,step=step.id,number=step.number,index=index,ready=ready,cursor=shared.core.cursor,
           pending=shared.core.pending,modelKey=shared.modelKey,settings=shared.settings,profile=shared.profile,
