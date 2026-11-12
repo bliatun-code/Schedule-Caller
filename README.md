@@ -8,7 +8,9 @@ Full-screen aerobatic practice widgets for FrSky ETHOS. Advance, repeat or resta
 | **F3A** | A-27, P-27 and F-27, including their figure 10 alternatives |
 | **Sportflyer** | F3A-Sport 2011 and Vingtreff |
 
-[Installation packages](https://github.com/bliatun-code/Schedule-Caller/releases) · [Illustrated setup guide](docs/Configuration.md) · [Norsk konfigurasjonsguide](docs/Konfigurasjon-norsk.md) · [Lua source](src/) · [Credits and rights](RIGHTS.md)
+**Version 1.0.2** starts reliably at power-on, also when settings are saved for many schedules, and runs more lightly next to the VoltDeck and GasDeck widgets. Calls, audio, diagrams and settings are the same as in 1.0.0, and your settings carry over when you install 1.0.2 on top. [Release notes](https://github.com/bliatun-code/Schedule-Caller/releases/tag/v1.0.2)
+
+[Installation packages](https://github.com/bliatun-code/Schedule-Caller/releases/latest) · [Illustrated setup guide](docs/Configuration.md) · [Norsk konfigurasjonsguide](docs/Konfigurasjon-norsk.md) · [Lua source](src/) · [Credits and rights](RIGHTS.md)
 
 ![Diagram view advancing through two manoeuvres in each of the IMAC, F3A and Sportflyer widgets](docs/images/diagram-preview.gif)
 
