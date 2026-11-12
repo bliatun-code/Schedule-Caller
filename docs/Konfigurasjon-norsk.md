@@ -1,15 +1,17 @@
 # Oppsett av Schedule Caller
 
-De tre utgavene har de samme menyene. Skjermbildene viser Schedule Caller 1.0.0 i X20RS-simulatoren med ETHOS 26.1.2. Menyvalgene nedenfor står med de engelske navnene du ser på radioen.
+De tre utgavene har de samme menyene. Skjermbildene viser Schedule Caller 1.0.2 i X20RS-simulatoren med ETHOS 26.1.2. Menyvalgene nedenfor står med de engelske navnene du ser på radioen.
 
 [English setup guide](Configuration.md)
 
 ## Installer og åpne widgeten
 
-1. Last ned ZIP-filen for **IMAC**, **F3A** eller **Sportflyer** fra [Releases](https://github.com/bliatun-code/Schedule-Caller/releases).
+1. Last ned ZIP-filen for **IMAC**, **F3A** eller **Sportflyer** fra [Releases](https://github.com/bliatun-code/Schedule-Caller/releases/latest).
 2. Koble radioen til FrSky Suite. Åpne **Lua library → Install Lua scripts** og installer ZIP-filen. Beregn noen minutter for de større utgavene, og la radioen være tilkoblet til Suite er ferdig.
 3. Start radioen på nytt og legg den valgte utgaven i et widgetfelt som dekker **hele skjermen**.
 4. Trykk på widgeten eller på midtknappen på høyre side av X20RS. Velg **Configure widget** i ETHOS-menyen.
+
+Ved oppdatering fra 1.0.0 installerer du 1.0.2-ZIP-filen på samme måte og starter radioen på nytt. Innstillingene dine beholdes. Øverst i **Configure widget** ser du hvilken versjon som er installert.
 
 ![ETHOS-oppsettet med versjonsnummer og de tre lukkede menyseksjonene](images/configure-widget.png)
 
