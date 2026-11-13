@@ -1,6 +1,6 @@
 # Schedule Caller setup
 
-The three editions use the same configuration menus. Screenshots show Schedule Caller 1.0.2 in the X20RS simulator with ETHOS 26.1.2.
+The three editions use the same configuration menus. Screenshots show Schedule Caller 1.0.4 in the X20RS simulator with ETHOS 26.1.2.
 
 [Norsk konfigurasjonsguide](Konfigurasjon-norsk.md)
 
@@ -11,7 +11,7 @@ The three editions use the same configuration menus. Screenshots show Schedule C
 3. Restart the radio and add that edition to a **full-screen** widget area on your model.
 4. Tap the widget or press the right-side centre button on the X20RS. Choose **Configure widget** from the ETHOS menu.
 
-To update from 1.0.0, install the 1.0.2 ZIP the same way and restart the radio. Your settings carry over. **Configure widget** shows the installed version at the top.
+To update from 1.0.2 or 1.0.0, install the 1.0.4 ZIP the same way and restart the radio. Your settings carry over. **Configure widget** shows the installed version at the top.
 
 ![ETHOS widget configuration page showing the version and the three collapsed sections](images/configure-widget.png)
 
