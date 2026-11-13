@@ -6,7 +6,7 @@ local Buttons=dofile(BASE.."lib/buttons.lua")
 local Store=dofile(BASE.."lib/store.lua")
 local Render=dofile(BASE.."lib/render.lua")
 local Index=dofile(BASE.."programs/index.lua").programs
-local VERSION="1.0.2"
+local VERSION="1.0.4"
 local AUDIO_PENDING="Audio installation incomplete. Reinstall the sound library."
 local shared={instances={},revision=1,events={},metrics={polls=0,builds=0,paints=0,buildMs=0,maxBuildMs=0,paintMs=0,maxPaintMs=0,gcSteps=0,gcMs=0,maxGcMs=0},audioReady=false}
 local configure

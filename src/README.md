@@ -1,6 +1,6 @@
 # Lua source reference
 
-The three Schedule Caller editions use a common engine and retain their own entry point and renderer. Each Lua file is from the corresponding 1.0.2 widget.
+The three Schedule Caller editions use a common engine and retain their own entry point and renderer. Each Lua file is from the corresponding 1.0.4 widget.
 
 | Package path | Source location |
 | --- | --- |
