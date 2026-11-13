@@ -4,13 +4,28 @@
 -- the last widget is destroyed, for example after a model change.
 local BASE="SCRIPTS:/ScheduleCallerIMAC/"
 local widget
+-- Ethos keeps the functions a widget gives to its menu and settings form, also after
+-- the widget is destroyed. These small functions reach the widget code only through
+-- `widget`, so a released widget can still be freed.
+local bridges={}
+local function bridge(key)
+  local run=bridges[key]
+  if not run then
+    run=function(...) if widget then return widget.call(key,...) end end
+    bridges[key]=run
+  end
+  return run
+end
 local function forward(name)
   return function(w,...)
     if widget then return widget[name](w,...) end
   end
 end
 local function create()
-  if not widget then widget=dofile(BASE.."lib/widget.lua") end
+  if not widget then
+    widget=dofile(BASE.."lib/widget.lua")
+    widget.attach(bridge)
+  end
   return widget.create()
 end
 local function destroy(w)

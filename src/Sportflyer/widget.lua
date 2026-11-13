@@ -488,9 +488,17 @@ local function event(w,category,value,x,y)
   end
   return false
 end
+-- Ethos keeps menu and settings-form functions after the widget is destroyed, so the
+-- functions given to Ethos come from main.lua (attach) and reach the widget through
+-- handlers, which release() empties.
+local handlers={}
+local function Bridge(key)
+  return function(...) local run=handlers[key];if run then return run(...) end end
+end
 local function menu(w)
   if shared.simulation then shared.menuCalls=(shared.menuCalls or 0)+1 end
-  return {{"New round",function() claimOwner(w);action("reset") end}}
+  handlers["menu:1"]=function() claimOwner(w);action("reset") end
+  return {{"New round",Bridge("menu:1")}}
 end
 configure=function(w)
   if not valid(w) then return end
@@ -523,7 +531,8 @@ configure=function(w)
     end
     item.owner,item.isChoice=w,choices~=nil
     item.getter,item.setter,item.enabled,item.choices=getter,setter,enabled,choices
-    return item.get,item.set
+    handlers["get:"..label],handlers["set:"..label]=item.get,item.set
+    return Bridge("get:"..label),Bridge("set:"..label)
   end
   if shared.simulation then w.configFields={};w.configPanels={} end
   local function current() return valid(w) and w.configGeneration==generation end
@@ -630,6 +639,7 @@ end
 -- main.lua calls this after the last widget is destroyed, for example when the
 -- model changes. destroy() has already saved the settings.
 local function release()
+  for key in pairs(handlers) do handlers[key]=nil end
   if shared.images then shared.images:clear() end
   if _G.SC_TEST and SC_TEST.shared==shared then _G.SC_TEST=nil end
 end
@@ -659,4 +669,6 @@ do
   end
 end
 return {create=create,read=read,write=write,wakeup=wakeup,paint=paint,event=event,menu=menu,configure=configure,
-  destroy=destroy,unused=function() return #shared.instances==0 end,release=release}
+  destroy=destroy,unused=function() return #shared.instances==0 end,release=release,
+  call=function(key,...) local run=handlers[key];if run then return run(...) end end,
+  attach=function(bridge) Bridge=bridge end}
