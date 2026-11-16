@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a problem with Schedule Caller on your radio or in the simulator.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: You can report the issue in English or Norwegian.
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Schedule Caller edition
+      options:
+        - IMAC
+        - F3A
+        - Sportflyer
+    validations:
+      required: true
+  - type: input
+    id: caller-version
+    attributes:
+      label: Schedule Caller version
+      description: Shown at the top of Configure widget.
+      placeholder: "1.0.4"
+    validations:
+      required: true
+  - type: input
+    id: radio-model
+    attributes:
+      label: Radio model
+      placeholder: "FrSky X20RS"
+    validations:
+      required: true
+  - type: input
+    id: ethos-version
+    attributes:
+      label: ETHOS version
+      placeholder: "26.1.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where did it happen?
+      options:
+        - Physical radio
+        - ETHOS simulator
+        - Both
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the schedule and figure if the problem occurs during a call. For an installation issue, include your FrSky Suite version.
+      placeholder: |
+        1. Open …
+        2. Select …
+        3. Press …
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the exact error message if one appeared.
+    validations:
+      required: true
