@@ -8,7 +8,7 @@ Full-screen aerobatic practice widgets for FrSky ETHOS. Advance, repeat or resta
 | **F3A** | A-27, P-27 and F-27, including their figure 10 alternatives |
 | **Sportflyer** | F3A-Sport 2011 and Vingtreff |
 
-**Version 1.0.4** uses far less Lua memory. The widget code is loaded only when a model uses Schedule Caller and is freed again when you change to a model that does not, also after you have used the widget menu. It keeps the reliable power-on and the lighter running next to the VoltDeck and GasDeck widgets from 1.0.2. Calls, audio, diagrams and settings are unchanged, and your settings carry over when you install 1.0.4 on top. [Release notes](https://github.com/bliatun-code/Schedule-Caller/releases/tag/v1.0.4)
+**Version 1.0.5** keeps only one diagram in memory at a time. The next diagram is loaded after the previous one has been freed, which leaves more free image memory for other widgets, and the figure and its diagram change together. It keeps the low Lua memory use from 1.0.4, where the widget code is loaded only when a model uses Schedule Caller. Calls, audio, diagrams and settings are unchanged, and your settings carry over when you install 1.0.5 on top. [Release notes](https://github.com/bliatun-code/Schedule-Caller/releases/tag/v1.0.5)
 
 [Installation packages](https://github.com/bliatun-code/Schedule-Caller/releases/latest) · [Illustrated setup guide](docs/Configuration.md) · [Norsk konfigurasjonsguide](docs/Konfigurasjon-norsk.md) · [Lua source](src/) · [Credits and rights](RIGHTS.md)
 
