@@ -443,7 +443,10 @@ local function wakeup(w)
     local changed=shared.images:select(path,time)
     if shared.images:update(now()) or changed then dirty() end
   end
-  if w.refresh or w.seenRevision~=shared.revision or w.seenCoreRevision~=shared.core.revision then
+  -- While the next diagram replaces a shown one, keep the previous screen (at most a few tenths of
+  -- a second), so the figure and its diagram change together without "Loading diagram..." first.
+  local settling=w.visible and w.plan~=nil and shared.images~=nil and shared.images:settling(now())
+  if not settling and (w.refresh or w.seenRevision~=shared.revision or w.seenCoreRevision~=shared.core.revision) then
     -- Behind VoltDeck/GasDeck the plan is not drawn. Rebuild it when this
     -- instance becomes visible; keep the first plan so paint always has one.
     if w.visible or not w.plan then buildPlan(w) end
